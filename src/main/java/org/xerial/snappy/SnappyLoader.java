@@ -169,14 +169,34 @@ public class SnappyLoader
     {
 
         nativeLibFile = findNativeLibrary();
-        if (nativeLibFile != null) {
-            // Load extracted or specified snappyjava native library.
-            System.load(nativeLibFile.getAbsolutePath());
-        }
-        else {
-            // Load preinstalled snappyjava (in the path -Djava.library.path)
-            System.loadLibrary("snappyjava");
-        }
+		try {
+			if (nativeLibFile != null) {
+				// Load extracted or specified snappyjava native library.
+				System.load(nativeLibFile.getAbsolutePath());
+			} else {
+				// Load preinstalled snappyjava (in the path -Djava.library.path)
+				System.loadLibrary("snappyjava");
+			}
+		} catch (UnsatisfiedLinkError e) {
+			if (e.getMessage().contains("already loaded")) {
+        		// wait for library is unloaded
+        		for (int i = 0; i < 3; ++i) {
+        			System.gc();
+        			try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+					}
+        		}
+    			if (nativeLibFile != null) {
+    				// Load extracted or specified snappyjava native library.
+    				System.load(nativeLibFile.getAbsolutePath());
+    			} else {
+    				// Load preinstalled snappyjava (in the path -Djava.library.path)
+    				System.loadLibrary("snappyjava");
+    			}
+			} else
+				throw e;
+		}
     }
 
     private static boolean contentsEquals(InputStream in1, InputStream in2)

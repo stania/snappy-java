@@ -22,4 +22,6 @@ project/plugins/project/
 .scala_dependencies
 atlassian-ide-plugin.xml
 
-
+.classpath
+.project
+.settings
