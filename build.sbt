@@ -151,3 +151,5 @@ releaseProcess := Seq[ReleaseStep](
 com.etsy.sbt.Checkstyle.checkstyleSettings
 
 com.etsy.sbt.Checkstyle.CheckstyleTasks.checkstyleConfig := file("src/checkstyle/checks.xml")
+
+publishTo := Some(Resolver.sftp("Maven Repistory", "staging.araqne.org", 2222, "/home/service/araqne/"))

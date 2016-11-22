@@ -55,8 +55,21 @@ public class SnappyBundleActivator
             // some MacOS JDK7+ vendors map to dylib instead of jnilib
             library = library.replace(".dylib", ".jnilib");
         }
-        System.loadLibrary(library);
-        SnappyLoader.setApi(new SnappyNative());
+        try {
+        	System.loadLibrary(library);
+        	SnappyLoader.setApi(new SnappyNative());
+        } catch (UnsatisfiedLinkError e) {
+        	if (e.getMessage().contains("already loaded")) {
+        		// wait for library is unloaded
+        		for (int i = 0; i < 3; ++i) {
+        			System.gc();
+        			Thread.sleep(100);
+        		}
+        		System.loadLibrary(library);
+        		SnappyLoader.setApi(new SnappyNative());
+        	} else
+        		throw e;
+        }
     }
 
     public void stop(BundleContext context)
